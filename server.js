@@ -5,19 +5,29 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
+
+// ВАЖНО: Настройка Socket.IO для Railway
 const io = socketIo(server, {
     cors: {
         origin: "*",
-        methods: ["GET", "POST"]
-    }
+        methods: ["GET", "POST"],
+        credentials: false
+    },
+    // Разрешаем WebSocket транспорт
+    transports: ['websocket', 'polling']
 });
 
-// Отдача статических файлов из текущей папки
-app.use(express.static(__dirname));
+// Отдача статических файлов
+app.use(express.static(path.join(__dirname)));
 
 // Маршрут для главной страницы
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Проверка здоровья (нужно для Railway)
+app.get('/health', (req, res) => {
+    res.status(200).send('OK');
 });
 
 const rooms = new Map();
@@ -79,7 +89,8 @@ io.on('connection', (socket) => {
     });
 });
 
+// ВАЖНО: Используем process.env.PORT для Railway
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log(`Сервер запущен: http://localhost:${PORT}`);
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`Сервер запущен на порту ${PORT}`);
 });

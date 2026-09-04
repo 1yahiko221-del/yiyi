@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Синхронное прослушивание музыки</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Синхронное прослушивание</h1>
+        
+        <div class="room-controls">
+            <input type="text" id="roomId" placeholder="ID комнаты">
+            <button onclick="createRoom()">Создать комнату</button>
+            <button onclick="joinRoom()">Присоединиться</button>
+        </div>
+        
+        <div class="player" id="player" style="display: none;">
+            <div class="song-info">
+                <h2 id="songTitle">Название песни</h2>
+                <p id="songArtist">Исполнитель</p>
+            </div>
+            
+            <audio id="audioPlayer" controls>
+                <source src="" type="audio/mpeg">
+                Ваш браузер не поддерживает аудио
+            </audio>
+            
+            <div class="controls">
+                <button onclick="togglePlay()">▶️ Воспроизвести/Пауза</button>
+                <input type="range" id="volume" min="0" max="100" value="100">
+                <input type="file" id="fileInput" accept="audio/*">
+            </div>
+            
+            <div class="playlist">
+                <h3>Плейлист</h3>
+                <ul id="playlist"></ul>
+            </div>
+        </div>
+        
+        <div class="users">
+            <h3>Участники комнаты</h3>
+            <ul id="usersList"></ul>
+        </div>
+    </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

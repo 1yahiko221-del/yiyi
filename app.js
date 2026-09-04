@@ -25,13 +25,18 @@ function joinRoom() {
 
 // Инициализация WebSocket
 function initializeSocket() {
-    // Замените на ваш сервер WebSocket
-    socket = io('http://localhost:3000');
+    // ВАЖНО: Для Railway используем относительный путь
+    socket = io();
     
     socket.on('connect', () => {
         console.log('Подключено к серверу');
         socket.emit('join-room', roomId);
         document.getElementById('player').style.display = 'block';
+    });
+    
+    socket.on('connect_error', (error) => {
+        console.error('Ошибка подключения:', error);
+        alert('Не удалось подключиться к серверу');
     });
     
     socket.on('user-joined', (userId) => {
@@ -85,7 +90,7 @@ function initializeSocket() {
     });
 }
 
-// Функции управления проигрывателем
+// Остальные функции остаются те же...
 function togglePlay() {
     if (audioPlayer.paused) {
         audioPlayer.play();
@@ -103,11 +108,7 @@ function loadSong(index) {
     const song = playlist[index];
     
     if (song.type === 'file') {
-        // Для локальных файлов
         audioPlayer.src = song.url;
-    } else {
-        // Для стриминговых сервисов (YouTube, Spotify и т.д.)
-        // Здесь можно добавить интеграцию с API
     }
     
     document.getElementById('songTitle').textContent = song.title;
@@ -129,7 +130,6 @@ function updatePlaylistUI() {
     });
 }
 
-// Обработчики событий
 document.getElementById('fileInput').addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -154,10 +154,6 @@ document.getElementById('fileInput').addEventListener('change', (e) => {
     }
 });
 
-audioPlayer.addEventListener('timeupdate', () => {
-    // Можно добавить синхронизацию времени
-});
-
 audioPlayer.addEventListener('seeked', () => {
     if (socket) {
         socket.emit('seek', audioPlayer.currentTime);
@@ -168,7 +164,6 @@ document.getElementById('volume').addEventListener('input', (e) => {
     audioPlayer.volume = e.target.value / 100;
 });
 
-// Вспомогательные функции
 function addUserToList(userId) {
     const usersList = document.getElementById('usersList');
     const li = document.createElement('li');
