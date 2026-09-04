@@ -6,15 +6,14 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 
-// ВАЖНО: Настройка Socket.IO для Railway
+// Настройка Socket.IO для Railway
 const io = socketIo(server, {
     cors: {
         origin: "*",
-        methods: ["GET", "POST"],
-        credentials: false
+        methods: ["GET", "POST"]
     },
-    // Разрешаем WebSocket транспорт
-    transports: ['websocket', 'polling']
+    transports: ['websocket', 'polling'],
+    allowEIO3: true
 });
 
 // Отдача статических файлов
@@ -25,7 +24,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Проверка здоровья (нужно для Railway)
+// Проверка здоровья для Railway
 app.get('/health', (req, res) => {
     res.status(200).send('OK');
 });
@@ -37,11 +36,17 @@ io.on('connection', (socket) => {
     
     socket.on('join-room', (roomId) => {
         socket.join(roomId);
+        console.log(`Пользователь ${socket.id} присоединился к комнате ${roomId}`);
         
         if (!rooms.has(roomId)) {
             rooms.set(roomId, {
                 users: new Set(),
-                state: {}
+                state: {
+                    playlist: [],
+                    currentSongIndex: 0,
+                    currentTime: 0,
+                    isPlaying: false
+                }
             });
         }
         
@@ -49,19 +54,15 @@ io.on('connection', (socket) => {
         room.users.add(socket.id);
         
         // Отправляем текущее состояние новому пользователю
-        socket.emit('sync-state', room.state);
-        
-        // Уведомляем остальных о новом пользователе
-        socket.to(roomId).emit('user-joined', socket.id);
-        
-        socket.on('disconnect', () => {
-            room.users.delete(socket.id);
-            socket.to(roomId).emit('user-left', socket.id);
-            
-            if (room.users.size === 0) {
-                rooms.delete(roomId);
-            }
+        socket.emit('sync-state', {
+            playlist: room.state.playlist,
+            currentSongIndex: room.state.currentSongIndex,
+            currentTime: room.state.currentTime,
+            isPlaying: room.state.isPlaying
         });
+        
+        // Отправляем список пользователей
+        io.to(roomId).emit('users-update', Array.from(room.users));
         
         // Обработчики событий проигрывателя
         socket.on('play', () => {
@@ -79,17 +80,30 @@ io.on('connection', (socket) => {
             socket.to(roomId).emit('seek', time);
         });
         
-        socket.on('new-song', (songData) => {
-            if (!room.state.playlist) {
-                room.state.playlist = [];
-            }
+        socket.on('song-change', (index) => {
+            room.state.currentSongIndex = index;
+            room.state.currentTime = 0;
+            socket.to(roomId).emit('song-change', index);
+        });
+        
+        socket.on('add-song', (songData) => {
             room.state.playlist.push(songData);
-            socket.to(roomId).emit('new-song', songData);
+            io.to(roomId).emit('add-song', songData);
+        });
+        
+        socket.on('disconnect', () => {
+            room.users.delete(socket.id);
+            io.to(roomId).emit('users-update', Array.from(room.users));
+            
+            if (room.users.size === 0) {
+                rooms.delete(roomId);
+                console.log(`Комната ${roomId} удалена`);
+            }
         });
     });
 });
 
-// ВАЖНО: Используем process.env.PORT для Railway
+// Используем порт от Railway
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`Сервер запущен на порту ${PORT}`);
