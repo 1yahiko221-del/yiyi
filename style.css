@@ -1,0 +1,170 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    max-width: 600px;
+    width: 100%;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.room-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.room-controls input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.room-controls button {
+    padding: 10px 15px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.room-controls button:hover {
+    background: #5a67d8;
+}
+
+.player {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.song-info {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.song-info h2 {
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.song-info p {
+    color: #666;
+}
+
+#audioPlayer {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.controls button {
+    padding: 10px 20px;
+    background: #764ba2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.controls button:hover {
+    background: #663399;
+}
+
+.controls input[type="range"] {
+    flex: 1;
+}
+
+.controls input[type="file"] {
+    flex: 1;
+}
+
+.playlist {
+    background: white;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.playlist h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.playlist ul {
+    list-style: none;
+}
+
+.playlist li {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.playlist li:hover {
+    background: #f0f0f0;
+}
+
+.playlist li.active {
+    background: #e8eaff;
+    color: #667eea;
+    font-weight: bold;
+}
+
+.users {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.users h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.users ul {
+    list-style: none;
+}
+
+.users li {
+    padding: 5px 0;
+    color: #666;
+}
+
+.users li::before {
+    content: "👤 ";
+}
